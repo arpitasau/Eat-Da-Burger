@@ -1,17 +1,87 @@
-const mysql = require("mysql");
+const connection = require("../config/connection");
 
-if (process.env.JAWSDB_URL) {
-    connection = mysql.createConnection(process.env.JAWSDB_URL);
-} else {
-    let connection = mysql.createConnection({
-        host: "localhost",
-        port: 3306,
-        user: "root",
-        password: "rootarpita1",
-        database: "burgers_db"
+//to
+function createQmarks(num) {
+  let arr = [];
+  for (let i = 0; i < num; i++) {
+    arr.push("?");
+  }
+  return arr.toString();
+}
+//this function translates a string to a sql query
+function translateSql(ob) {
+  let arr = [];
+  for (let key in ob) {
+    let value = ob[key];
+    if (Object.hasOwnProperty.call(ob, key)) {
+      if (typeof value === "string" && value.indexOf(" ") >= 0) {
+        value = "'" + value + "'";
+      }
+      arr.push(key + "=" + value);
+    }
+  }
+  return arr.toString();
+}
+
+let orm = {
+  selectAll: function(table, cb) {
+    let dbQuery = "SELECT * FROM " + table + ";";
+
+    connection.query(dbQuery, function(err, res) {
+      if (err) {
+        throw err;
+      }
+      cb(res);
     });
+  },
+  insertOne: function(table, cols, vals, cb) {
+    let dbQuery =
+      "INSERT INTO " +
+      table +
+      " (" +
+      cols.toString() +
+      ") " +
+      "VALUES (" +
+      createQmarks(vals.length) +
+      ") ";
+
+    console.log(dbQuery);
+    connection.query(dbQuery, vals, function(err, res) {
+      if (err) {
+        throw err;
+      }
+      cb(res);
+    });
+  },
+  updateOne: function(table, objColVals, condition, cb) {
+    let dbQuery =
+      "UPDATE " +
+      table +
+      " SET " +
+      translateSql(objColVals) +
+      " WHERE " +
+      condition;
+
+    console.log(dbQuery);
+
+    connection.query(dbQuery, function(err, res) {
+      if (err) {
+        throw err;
+      }
+      cb(res);
+    });
+  },
+  deleteOne: function(table, condition, cb) {
+    let dbQuery = "DELETE FROM " + table + " WHERE " + condition;
+    console.log(dbQuery);
+
+    connection.query(dbQuery, function(err, res) {
+      if (err) {
+        throw err;
+      }
+      cb(res);
+    });
+  }
 };
+module.exports = orm;
 
-connection.connect(err => err ? console.error(`Error connecting to DB: ${err.stack}`) : console.log(`Connected as ID: ${connection.threadId}`));
-
-module.exports = connection;
