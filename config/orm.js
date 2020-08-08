@@ -1,4 +1,4 @@
-const connection = require("../config/connection");
+let connection = require("../config/connection");
 
 //to
 function createQmarks(num) {
