@@ -22,4 +22,4 @@
 
 
 ## Link to the application deployed in Heroku
-<a href = "" target ="_blank">Please click here to see the deployed application</a>
+<a href = "https://murmuring-bayou-20419.herokuapp.com/" target ="_blank">Please click here to see the deployed application</a>
